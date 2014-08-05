@@ -11,7 +11,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start/0, stop/0]). %%, write/2, delete/1, read/1, match/1]).
+-export([start/0, stop/0, write/2, read/1]).
 -export([start_link/0]).
 
 %% gen_server callbacks
@@ -31,13 +31,23 @@
 
 %%--------------------------------------------------------------------
 %% @doc
+%% returns the element associated with the key
+%%
+%% @spec read(Key) -> {ok, Element} | {error, instance}
+%% @end
+%%--------------------------------------------------------------------
+read(Key) ->
+    gen_server:call(?SERVER, {read, Key}).
+
+%%--------------------------------------------------------------------
+%% @doc
 %% Writes the key/value pair to the database
 %%
 %% @spec write(Key, Element) -> ok
 %% @end
 %%--------------------------------------------------------------------
 write(Key, Element) ->
-    gen_server:call({write, Key, Element}).
+    gen_server:call(?SERVER, {write, Key, Element}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -103,10 +113,12 @@ init([]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call(stop, _From, State) ->
-        
-        Reply = ok,
-        {reply, Reply, State}.
+handle_call({read, Key}, _From, State)           ->
+        Reply = db:read(Key, State),
+        {reply, Reply, State} ;
+handle_call({write, Key, Element}, _From, State) ->
+        New_state = db:write(Key, Element, State), 
+        {reply, ok, New_state}.
 
 %%--------------------------------------------------------------------
 %% @private
