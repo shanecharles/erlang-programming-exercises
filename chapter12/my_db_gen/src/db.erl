@@ -13,7 +13,11 @@ delete(Key, Db) ->
     lists:keydelete(Key, 1, Db).
 
 read(Key, Db) ->
-    lists:keyfind(Key, 1, Db).
+    Result = lists:keyfind(Key, 1, Db),
+    case Result of
+        {Key, Element}    -> {ok, Element} ;
+        {error, instance} -> {error, instance}
+    end.
 
 match(Element, Db) ->
     [Key || {Key, _Elem} <- lists:filter(fun({_Key, Elem}) -> Elem =:= Element end, Db)].
