@@ -11,7 +11,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start/0, stop/0, write/2, read/1]).
+-export([start/0, stop/0, write/2, read/1, match/1]).
 -export([start_link/0]).
 
 %% gen_server callbacks
@@ -28,6 +28,16 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc
+%% returns a list of keys containing the element
+%%
+%% @spec match(Element) -> [Key1, Key2, ..., KeyN]
+%% @end
+%%--------------------------------------------------------------------
+match(Element) ->
+    gen_server:call(?SERVER, {match, Element}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -113,6 +123,9 @@ init([]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_call({match, Element}, _From, State)      ->
+        Reply = db:match(Element, State),
+        {reply, Reply, State} ;
 handle_call({read, Key}, _From, State)           ->
         Reply = db:read(Key, State),
         {reply, Reply, State} ;
