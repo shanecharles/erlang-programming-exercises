@@ -16,7 +16,7 @@ read(Key, Db) ->
     Result = lists:keyfind(Key, 1, Db),
     case Result of
         {Key, Element}    -> {ok, Element} ;
-        {error, instance} -> {error, instance}
+        false -> {error, instance}
     end.
 
 match(Element, Db) ->

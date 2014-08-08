@@ -11,7 +11,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start/0, stop/0, write/2, read/1, match/1]).
+-export([start/0, stop/0, write/2, read/1, match/1, delete/1]).
 -export([start_link/0]).
 
 %% gen_server callbacks
@@ -28,6 +28,16 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% Delete an entry with the Key supplied
+%%
+%% @spec delete(Key) -> ok
+%% @end
+%%--------------------------------------------------------------------
+delete(Key) ->
+    gen_server:call(?SERVER, {delete, Key}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -123,6 +133,8 @@ init([]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_call({delete, Key}, _From, State)         ->
+        {reply, ok, db:delete(Key, State)} ;
 handle_call({match, Element}, _From, State)      ->
         Reply = db:match(Element, State),
         {reply, Reply, State} ;
